@@ -1,9 +1,13 @@
 
-import java.io.*; 
-import java.net.*; 
-
-
 // Server class 
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 class Server { 
     public static void main(String[] args) 
     { 
@@ -51,8 +55,9 @@ class Server {
                 } 
             } 
         } 
-    } 
+    }
     
+    // ClientHandler class 
     private static class ClientHandler implements Runnable { 
         private final Socket clientSocket; 
   
