@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.LinkedList;
 
 public class Server {
 
@@ -13,7 +12,7 @@ public class Server {
         try {
             ServerSocket server = new ServerSocket(1234);
             System.out.println("🏫 Room Reservation Server Started...");
-            createRooms();
+            initializeRooms();
 
             while (true) {
                 Socket client = server.accept();
@@ -27,22 +26,25 @@ public class Server {
     }
 
     // Create rooms manually
-    public static void createRooms() {
-        rooms.add(new Room("Lab", "Lab1", "Sunday", "8-10"));
-        rooms.add(new Room("Lab", "Lab1", "Sunday", "10-12"));
-        rooms.add(new Room("Lab", "Lab1", "Sunday", "12-2"));
-        rooms.add(new Room("Meeting", "Meeting1", "Sunday", "8-10"));
-        rooms.add(new Room("Meeting", "Meeting1", "Sunday", "10-12"));
-        rooms.add(new Room("Meeting", "Meeting1", "Sunday", "12-2"));
-        rooms.add(new Room("Research", "Research1", "Sunday", "8-10"));
-        rooms.add(new Room("Research", "Research1", "Sunday", "10-12"));
-        rooms.add(new Room("Research", "Research1", "Sunday", "12-2"));
-        rooms.add(new Room("Regular", "Regular1", "Sunday", "8-10"));
-        rooms.add(new Room("Regular", "Regular1", "Sunday", "10-12"));
-        rooms.add(new Room("Regular", "Regular1", "Sunday", "12-2"));
-        rooms.add(new Room("Seminar", "Seminar1", "Sunday", "8-10"));
-        rooms.add(new Room("Seminar", "Seminar1", "Sunday", "10-12"));
-        rooms.add(new Room("Seminar", "Seminar1", "Sunday", "12-2"));
+   private static void initializeRooms() {
+        String[] roomTypes = {"Lab", "Meeting Room", "Regular Room", "Research Room", "Conference Room"};
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        String[] timeSlots = {"8am-10am","10am-12pm","1pm-2pm"};
+        
+        for (String type : roomTypes) {
+            for (int j = 1; j <= 5; j++) {
+                String roomId = type + "-" + j;
+                Room room = new Room(roomId, type);
+                
+                for (String day : days) {
+                    for (String time : timeSlots) {
+                        String slotId = roomId + "-" + day + "-" + time;
+                        room.addTimeSlot(new TimeSlot(slotId));
+                    }
+                }
+                rooms.add(room);
+            }
+        }
     }
 
     // Register

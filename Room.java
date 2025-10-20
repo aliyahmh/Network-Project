@@ -1,21 +1,27 @@
 public class Room {
     private String type;
     private String ID;
-    private boolean available;
+    private TimeSlot[] timeSlots;
+    private int timeSlotCount;
+
 
     public Room(String type, String id) {
         this.type = type;
         this.ID = id;
-        this.available = true;
+        this.timeSlots = new TimeSlot[21]; // 7 days * 3 time slots
+        this.timeSlotCount = 0;
     }
-
+    
+    public String getId() { return ID; }
     public String getType() { return type; }
-    public String getName() { return ID; }
-    public boolean isAvailable() { return available; }
-    public void setAvailable(boolean available) { this.available = available; }
-
-    public String toString() {
-        return ID + " (" + type + ")";
+    public TimeSlot[] getTimeSlots() { return timeSlots; }
+    public int getTimeSlotCount() { return timeSlotCount; }
+    
+    public void addTimeSlot(TimeSlot slot) {
+        if (timeSlotCount < timeSlots.length) {
+            timeSlots[timeSlotCount] = slot;
+            timeSlotCount++;
+        }
     }
 }
 
