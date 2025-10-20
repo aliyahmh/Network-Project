@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Client {
+public class client {
     public static void main(String[] args) {
         try {
             Socket socket = new Socket("localhost", 1234);
