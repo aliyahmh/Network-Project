@@ -1,10 +1,11 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.LinkedList;
 
 public class Server {
 
-    static ArrayList<String> users = new ArrayList<String>();
+    static LinkedList<User> users = new LinkedList<User>();
     static ArrayList<Room> rooms = new ArrayList<Room>();
     static ArrayList<Reservation> reservations = new ArrayList<Reservation>();
 
@@ -44,19 +45,18 @@ public class Server {
         rooms.add(new Room("Seminar", "Seminar1", "Sunday", "12-2"));
     }
 
-    // Login
-    public static synchronized String login(String username) {
+    // Register
+    public static synchronized String Register(String username, String pass) {
         if (username == null || username.trim().equals("")) {
             return "❌ Username cannot be empty.";
         }
-
-        for (int i = 0; i < users.size(); i++) {
+        User u= new User(username, pass);
+         users.add(u);
+        return "✅ Hello " + username + "! You are now logged in.";
+        /*for (int i = 0; i < users.size(); i++) {
             if (users.get(i).equalsIgnoreCase(username))
                 return "✅ Welcome back, " + username + "!";
-        }
-
-        users.add(username);
-        return "✅ Hello " + username + "! You are now logged in.";
+        }*/   
     }
 
     // View available rooms — sends each line separately
