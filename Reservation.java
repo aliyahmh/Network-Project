@@ -4,7 +4,7 @@ public class Reservation {
     private String day;
     private String time;
 
-    public Reservation(String username, String roomName, String day, String time) {
+    public Reservation(String username, String roomName, String day, String time, String resID) {
         this.username = username;
         this.roomName = roomName;
         this.day = day;
@@ -15,6 +15,7 @@ public class Reservation {
     public String getRoomName() { return roomName; }
     public String getDay() { return day; }
     public String getTime() { return time; }
+    
 
     public String toString() {
         return username + " reserved " + roomName + " on " + day + " (" + time + ")";
