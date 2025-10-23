@@ -13,6 +13,11 @@ public class User {
     reservations=new LinkedList<Reservation>();
  }
 
+ public String getUserName(){
+    return username;
+ }
+
+
 
  public void addReservation(Reservation r) {
     reservations.add(r);

@@ -1,23 +1,28 @@
 public class Reservation {
     private String username;
-    private String roomName;
+    private String roomID;
     private String day;
     private String time;
+    private String ID;
 
-    public Reservation(String username, String roomName, String day, String time, String resID) {
+    public Reservation(String username, String roomID, String day, String time, String ID) {
         this.username = username;
-        this.roomName = roomName;
+        this.roomID = roomID;
         this.day = day;
         this.time = time;
+        this.ID = ID;
     }
 
     public String getUsername() { return username; }
-    public String getRoomName() { return roomName; }
+    public String getRoomID() { return roomID; }
     public String getDay() { return day; }
     public String getTime() { return time; }
+    public String getID() { return ID; }
+
+
     
 
     public String toString() {
-        return username + " reserved " + roomName + " on " + day + " (" + time + ")";
+        return username + " reserved " + roomID + " on " + day + " (" + time + ")";
     }
 }

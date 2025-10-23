@@ -61,105 +61,156 @@ public class Server {
         }*/   
     }
 
-    // View available rooms — sends each line separately
-    public static synchronized void sendAvailableRooms(PrintWriter out, String type, String day) {
-        int count = 0;
-        for (int i = 0; i < rooms.size(); i++) {
-            Room r = rooms.get(i);
-            if (r.getType().equalsIgnoreCase(type)
-                    && r.getDay().equalsIgnoreCase(day)
-                    && r.isAvailable()) {
-                count++;
-                out.println(count + ". " + r.toString());
+    private static User findUser(String username) {
+        for (User user : users) {
+            if (user.getUserName().equals(username)) {
+                return user;
             }
         }
-
-        if (count == 0)
-            out.println("❌ No available " + type + " rooms on " + day + ".");
-        else
-            out.println("\nTotal: " + count + " available room(s).");
-
-        // tell the client the list is over
-        out.println("END");
+        return null;
     }
 
-    // Reserve room with full validation
-    public static synchronized String reserveRoom(String username, String roomName, String day, String time) {
-        if (roomName.trim().equals("") || day.trim().equals("") || time.trim().equals("")) {
-            return "❌ Please fill in all fields.";
+    private static Reservation findReservation(String reservationId) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getID().equals(reservationId)) {
+                return reservation;
+            }
         }
+        return null;
+    }
 
-        // check if room exists
-        Room target = null;
-        for (int i = 0; i < rooms.size(); i++) {
-            Room r = rooms.get(i);
-            if (r.getName().equalsIgnoreCase(roomName)
-                    && r.getDay().equalsIgnoreCase(day)
-                    && r.getTime().equalsIgnoreCase(time)) {
-                target = r;
+
+
+
+    public static String getAvailableSlots(String roomType, String day) {
+        String result = "";
+        
+        for (Room room : rooms) {
+            if (room.getType().equals(roomType)) {
+                for (TimeSlot slot : room.getTimeSlots()) {
+                    if (slot.getDay().equals(day) && slot.isAvailable()) {
+                        if (!result.isEmpty()) {
+                            result += "|";
+                        }
+                        result += room.getId() + " - " + slot.getTime();
+                    }
+                }
+            }
+        }
+        return result.isEmpty() ? "ERROR: No available slots" : result;
+    }
+
+    
+        
+        
+
+
+ 
+
+    public static String makeReservation(String username, String slotId) {
+        String[] parts = slotId.split(" - ");
+        if (parts.length < 3) {  // Now we expect 3 parts!
+            return "ERROR: Invalid slot format";
+        }
+    
+        String roomId = parts[0];   // e.g., "Lab-1"
+        String day = parts[1];      // e.g., "Monday" 
+        String time = parts[2];     // e.g., "8:00 AM"
+        
+        // Now we have all the information we need!
+        // Rest of the method remains the same but simpler...
+        
+        // Find the room
+        Room targetRoom = null;
+        for (Room room : rooms) {
+            if (room.getId().equals(roomId)) {
+                targetRoom = room;
                 break;
             }
         }
-
-        if (target == null)
-            return "❌ Invalid room name, day, or time.";
-
-        // check if already reserved by anyone
-        if (!target.isAvailable())
-            return "❌ That slot is already reserved by someone else.";
-
-        // check if user already reserved this slot
-        for (int i = 0; i < reservations.size(); i++) {
-            Reservation res = reservations.get(i);
-            if (res.getUsername().equalsIgnoreCase(username)
-                    && res.getRoomName().equalsIgnoreCase(roomName)
-                    && res.getDay().equalsIgnoreCase(day)
-                    && res.getTime().equalsIgnoreCase(time)) {
-                return "❌ You already reserved this slot.";
-            }
+        
+        if (targetRoom == null) {
+            return "ERROR: Room not found";
         }
-
-        // reserve
-        target.setAvailable(false);
-        reservations.add(new Reservation(username, roomName, day, time));
-        return "✅ Reservation confirmed for " + roomName + " on " + day + " (" + time + ")";
-    }
-
-    // Cancel reservation
-    public static synchronized String cancelReservation(String username, String roomName, String day, String time) {
-        if (roomName.trim().equals("") || day.trim().equals("") || time.trim().equals("")) {
-            return "❌ Please fill in all fields.";
-        }
-
-        boolean found = false;
-
-        for (int i = 0; i < reservations.size(); i++) {
-            Reservation res = reservations.get(i);
-            if (res.getUsername().equalsIgnoreCase(username)
-                    && res.getRoomName().equalsIgnoreCase(roomName)
-                    && res.getDay().equalsIgnoreCase(day)
-                    && res.getTime().equalsIgnoreCase(time)) {
-                reservations.remove(i);
-                found = true;
+        
+        // Find the specific time slot using ALL three identifiers
+        TimeSlot targetSlot = null;
+        String fullSlotId = roomId + "-" + day + "-" + time;
+        
+        for (TimeSlot slot : targetRoom.getTimeSlots()) {
+            if (slot.getId().equals(fullSlotId) && slot.isAvailable()) {
+                targetSlot = slot;
                 break;
             }
         }
+        
+        if (targetSlot == null) {
+            return "ERROR: Slot not available";
+        }
+        
+        // Create reservation (same as before)
+        targetSlot.setAvailable(false);
+        String reservationId = "RES" + (reservations.size() + 1);
+        Reservation reservation = new Reservation(reservationId, username, roomId, day, time);
+        reservations.add(reservation);
+        
+        User user = findUser(username);
+        if (user != null) {
+            user.addReservation(reservation);
+        }
+        
+        return "SUCCESS: Reservation confirmed. ID: " + reservationId;
+    }
 
-        if (!found)
-            return "❌ You don’t have this reservation.";
 
-        // make room available again
-        for (int i = 0; i < rooms.size(); i++) {
-            Room r = rooms.get(i);
-            if (r.getName().equalsIgnoreCase(roomName)
-                    && r.getDay().equalsIgnoreCase(day)
-                    && r.getTime().equalsIgnoreCase(time)) {
-                r.setAvailable(true);
+    public static String cancelReservation(String reservationId, String username) {
+        // Find reservation
+        Reservation reservationToCancel = null;
+        
+        for (Reservation reservation : reservations) {
+            if (reservation.getID().equals(reservationId)) {
+                    reservationToCancel = reservation;
+                    break;
+                }
+            }
+        
+        
+        if (reservationToCancel == null) {
+            return "ERROR: Reservation not found";
+        }
+        
+        // Mark the time slot as available again
+        String roomId = reservationToCancel.getRoomID();
+        String day = reservationToCancel.getDay();
+        String time = reservationToCancel.getTime();
+        
+        for (Room room : rooms) {
+            if (room.getId().equals(roomId)) {
+                for (TimeSlot slot : room.getTimeSlots()) {
+                    if (slot.getDay().equals(day) && slot.getTime().equals(time)) {
+                        slot.setAvailable(true);
+                        break;
+                    }
+                }
+                break;
             }
         }
-
-        return "✅ Reservation cancelled successfully.";
+        
+        // Remove reservation from list
+        reservations.remove(reservationToCancel);
+        
+        // Remove from user's reservations
+        User user = findUser(username);
+        if (user != null) {
+            user.removeReservation(reservationToCancel);
+        }
+        
+        return "SUCCESS: Reservation cancelled";
     }
+
+
+
+
 
     // client handler
     private static class ClientHandler implements Runnable {
