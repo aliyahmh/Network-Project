@@ -5,7 +5,7 @@ import java.util.*;
 public class client {
     public static void main(String[] args) {
         try {
-            Socket socket = new Socket("localhost", 1234);
+            Socket socket = new Socket("localhost", 12345);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             Scanner sc = new Scanner(System.in);
@@ -14,7 +14,11 @@ public class client {
             System.out.print("Enter your username: ");
             String username = sc.nextLine();
             out.println(username);
+            System.out.print("Enter your password: ");
+            String pass = sc.nextLine();
+            out.println(pass);
             System.out.println(in.readLine());
+
 
             while (true) {
                 System.out.println("\nMenu:");
@@ -42,27 +46,26 @@ public class client {
                     }
                 }
                 else if (choice.equals("2")) {
+                     System.out.print("Enter  name (e.g., Lab1): ");
+                    String user = sc.nextLine();
                     System.out.print("Enter room name (e.g., Lab1): ");
                     String room = sc.nextLine();
                     System.out.print("Enter day: ");
                     String day = sc.nextLine();
                     System.out.print("Enter time (8-10 / 10-12 / 12-2): ");
                     String time = sc.nextLine();
-                    out.println(room);
-                    out.println(day);
-                    out.println(time);
+                    String slotid=room+" - "+day+" - "+time;
+                    out.println(user);
+                    out.println(slotid);
                     System.out.println("\n" + in.readLine());
                 }
                 else if (choice.equals("3")) {
-                    System.out.print("Enter room name: ");
-                    String room = sc.nextLine();
-                    System.out.print("Enter day: ");
-                    String day = sc.nextLine();
-                    System.out.print("Enter time: ");
-                    String time = sc.nextLine();
-                    out.println(room);
-                    out.println(day);
-                    out.println(time);
+                    System.out.print("Enter room reservation id : ");
+                    String id = sc.nextLine();
+                    System.out.print("Enter username: ");
+                    String name = sc.nextLine();
+                    out.println(id);
+                    out.println(name);
                     System.out.println("\n" + in.readLine());
                 }
                 else if (choice.equals("4")) {

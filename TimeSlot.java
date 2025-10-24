@@ -6,8 +6,10 @@ public class TimeSlot {
 
 
 
-    public TimeSlot(String id) {
+    public TimeSlot(String id, String day , String time ) {
         this.id = id;
+        this.day=day;
+        this.time=time;
         this.available = true;
     }
     

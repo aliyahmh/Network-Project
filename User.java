@@ -17,7 +17,9 @@ public class User {
     return username;
  }
 
-
+ public LinkedList<Reservation> getReservations(){
+   return reservations;
+ }
 
  public void addReservation(Reservation r) {
     reservations.add(r);
@@ -37,4 +39,4 @@ public void removeReservation(Reservation r) {
 
 
 
-}
+
