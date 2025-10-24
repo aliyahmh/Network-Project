@@ -5,10 +5,11 @@ import java.util.*;
 public class Server {
 
     static LinkedList<User> users = new LinkedList<User>();
-    static ArrayList<Room> rooms = new ArrayList<Room>();
+    static LinkedList<Room> rooms = new LinkedList<Room>();
     static ArrayList<Reservation> reservations = new ArrayList<Reservation>();
 
     public static void main(String[] args) {
+       
         try {
             ServerSocket server = new ServerSocket(12345);
             System.out.println("🏫 Room Reservation Server Started...");
@@ -34,17 +35,19 @@ public class Server {
         for (String type : roomTypes) {
             for (int j = 1; j <= 5; j++) {
                 String roomId = type + "-" + j;
-                Room room = new Room(roomId, type);
+                Room room = new Room(roomId,type);
                 
                 for (String day : days) {
                     for (String time : timeSlots) {
-                        String slotId = roomId + "-" + day + "-" + time;
+                        String slotId = roomId + ":" + day + ":" + time;
                         room.addTimeSlot(new TimeSlot(slotId,day,time));
                     }
                 }
                 rooms.add(room);
             }
         }
+         System.out.println("DEBUG: Total rooms initialized: " + rooms.size());
+    printAllRoomsAndSlots();
     }
 
     // Register
@@ -55,10 +58,7 @@ public class Server {
         User u= new User(username, pass);
          users.add(u);
         return "✅ Hello " + username + "! You are now logged in.";
-        /*for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).equalsIgnoreCase(username))
-                return "✅ Welcome back, " + username + "!";
-        }*/   
+          
     }
 
     private static User findUser(String username) {
@@ -129,7 +129,7 @@ public class Server {
  
 
     public static String makeReservation(String username, String slotId) {
-        String[] parts = slotId.split(" - ");
+        String[] parts = slotId.split(":");
         if (parts.length < 3) {  // Now we expect 3 parts!
             return "ERROR: Invalid slot format";
         }
@@ -230,7 +230,14 @@ public class Server {
     }
 
 
-
+public static void printAllRoomsAndSlots() {
+    for (Room room : rooms) {
+        System.out.println("Room: " + room.getId() + " (" + room.getType() + ")");
+        for (TimeSlot slot : room.getTimeSlots()) {
+            System.out.println(slot.getId() +"  - " + slot.getDay() + " " + slot.getTime() + " - Available: " + slot.isAvailable());
+        }
+    }
+}
 
 
     // client handler
@@ -242,6 +249,7 @@ public class Server {
         }
 
         public void run() {
+            
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -257,6 +265,7 @@ public class Server {
                         String type = in.readLine();
                         String day = in.readLine();
                         out.println(getAvailableSlots(type, day));
+                        //printAllRoomsAndSlots();
                     }
                     else if (option.equals("2")) {
                         String user = in.readLine();
