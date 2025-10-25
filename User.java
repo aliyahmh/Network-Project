@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class User {
  private String username;
  private String password;
- private int reservationCount;
+ //private int reservationCount;
  LinkedList<Reservation> reservations;
 
 
@@ -16,6 +16,11 @@ public class User {
  public String getUserName(){
     return username;
  }
+
+public String getPassword(){
+    return password;
+ }
+
 
  public LinkedList<Reservation> getReservations(){
    return reservations;

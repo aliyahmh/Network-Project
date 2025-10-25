@@ -6,7 +6,7 @@ public class Server {
 
     static LinkedList<User> users = new LinkedList<User>();
     static LinkedList<Room> rooms = new LinkedList<Room>();
-    static ArrayList<Reservation> reservations = new ArrayList<Reservation>();
+    static LinkedList<Reservation> reservations = new LinkedList<Reservation>();
 
     public static void main(String[] args) {
        
