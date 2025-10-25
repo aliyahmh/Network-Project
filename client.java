@@ -54,7 +54,7 @@ public class client {
                     String day = sc.nextLine();
                     System.out.print("Enter time (8-10 / 10-12 / 12-2): ");
                     String time = sc.nextLine();
-                    String slotid=room+" - "+day+" - "+time;
+                    String slotid=room+":"+day+":"+time;
                     out.println(user);
                     out.println(slotid);
                     System.out.println("\n" + in.readLine());

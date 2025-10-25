@@ -35,7 +35,7 @@ public class Server {
         for (String type : roomTypes) {
             for (int j = 1; j <= 5; j++) {
                 String roomId = type + "-" + j;
-                Room room = new Room(roomId,type);
+                Room room = new Room(type,roomId);
                 
                 for (String day : days) {
                     for (String time : timeSlots) {
@@ -122,6 +122,31 @@ public class Server {
     }
 
     
+
+        /*public static String getAvailableSlots(String roomType, String day) {
+        String result = "";
+        System.out.println("DEBUG: Looking for " + roomType + " on " + day);
+        
+        for (Room room : rooms) {
+            System.out.println("DEBUG: Checking room " + room.getId() + " of type " + room.getType());
+            if (room.getType().equals(roomType)) {
+                // FIX: Properly iterate through the array
+                TimeSlot[] slots = room.getTimeSlots();
+                for (int i = 0; i < room.getTimeSlotCount(); i++) {
+                    TimeSlot slot = slots[i];
+                    System.out.println("DEBUG: Slot - " + slot.getDay() + " " + slot.getTime() + " Available: " + slot.isAvailable());
+                    if (slot.getDay().equals(day) && slot.isAvailable()) {
+                        if (!result.isEmpty()) {
+                            result += "|";
+                        }
+                        result += room.getId() + ":" + day + ":" + slot.getTime();
+                    }
+                }
+            }
+        }
+        System.out.println("DEBUG: Result: " + result);
+        return result.isEmpty() ? "ERROR: No available slots" : result;
+    }*/
         
         
 
@@ -156,7 +181,7 @@ public class Server {
         
         // Find the specific time slot using ALL three identifiers
         TimeSlot targetSlot = null;
-        String fullSlotId = roomId + "-" + day + "-" + time;
+        String fullSlotId = roomId + ":" + day + ":" + time;
         
         for (TimeSlot slot : targetRoom.getTimeSlots()) {
             if (slot.getId().equals(fullSlotId) && slot.isAvailable()) {
@@ -172,7 +197,7 @@ public class Server {
         // Create reservation (same as before)
         targetSlot.setAvailable(false);
         String reservationId = "RES" + (reservations.size() + 1);
-        Reservation reservation = new Reservation(reservationId, username, roomId, day, time);
+        Reservation reservation = new Reservation(username, roomId, day, time, reservationId);
         reservations.add(reservation);
         
         User user = findUser(username);
@@ -264,8 +289,17 @@ public static void printAllRoomsAndSlots() {
                     if (option.equals("1")) {
                         String type = in.readLine();
                         String day = in.readLine();
-                        out.println(getAvailableSlots(type, day));
-                        //printAllRoomsAndSlots();
+                        String result = getAvailableSlots(type, day);
+                        // Send available slots line by line
+                        if (result.startsWith("ERROR")) {
+                            out.println(result);
+                        } else {
+                            String[] slots = result.split("\\|");
+                            for (String slot : slots) {
+                                out.println(slot);
+                            }
+                        }
+                        out.println("END");
                     }
                     else if (option.equals("2")) {
                         String user = in.readLine();
