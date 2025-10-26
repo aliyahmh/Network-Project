@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Server {
+public class Server { 
 
     static LinkedList<User> users = new LinkedList<User>();
     static LinkedList<Room> rooms = new LinkedList<Room>();
@@ -52,8 +52,8 @@ public class Server {
 
     // Register
     public static synchronized String Register(String username, String pass) {
-        if (username == null || username.trim().equals("")) {
-            return "❌ Username cannot be empty.";
+        if (username == null || username.trim().equals("")) || password.trim().equals("") {
+            return "❌ Username  or password cannot be empty.";
         }
         User u= new User(username, pass);
          users.add(u);
@@ -68,7 +68,7 @@ public class Server {
             }
         }
         return null;
-    }
+	    }
 
     private static Reservation findReservation(String reservationId) {
         for (Reservation reservation : reservations) {
