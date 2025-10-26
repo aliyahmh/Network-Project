@@ -50,25 +50,52 @@ public class Server {
     printAllRoomsAndSlots();
     }
 
-    // Register
+    // Register new user
     public static synchronized String Register(String username, String pass) {
-        if (username == null || username.trim().equals("")) || password.trim().equals("") {
+        if (username == null || username.trim().equals("")) || password==null || password.trim().equals("") {
             return "❌ Username  or password cannot be empty.";
         }
+        User existingUser = findUser(username);
+
+        if (existingUser == null) {
+             return "❌ No account found with that username. Please register first.";}
+    
+
         User u= new User(username, pass);
          users.add(u);
-        return "✅ Hello " + username + "! You are now logged in.";
+        return "✅ Registration successful! Wlcome " + username +".";}
           
+    // Login existing user
+    public static synchronized String loginUser(String username, String password) {
+        if (username == null || username.trim().equals("") || password == null || password.trim().equals("")) {
+             return "❌ Username or password cannot be empty.";
     }
+
+    User existingUser = findUser(username);
+
+    if (existingUser == null) {
+        return "❌ No account found with that username. Please register first.";
+    }
+
+
+    if (existingUser.getPassword().equals(password)) {
+        return "✅ Welcome back, " + username + "! Login successful.";
+    } else {
+        return "❌ Incorrect password. Try again.";
+    }
+}
+    
+
 
     private static User findUser(String username) {
         for (User user : users) {
-            if (user.getUserName().equals(username)) {
-                return user;
+            if (user.getUserName().equals(username) && u.getPassword().equals(password)) {
+	              {
+                return true;
             }
         }
-        return null;
-	    }
+        return false;
+    }
 
     private static Reservation findReservation(String reservationId) {
         for (Reservation reservation : reservations) {
@@ -264,7 +291,6 @@ public static void printAllRoomsAndSlots() {
     }
 }
 
-
     // client handler
     private static class ClientHandler implements Runnable {
         private Socket socket;
@@ -281,7 +307,18 @@ public static void printAllRoomsAndSlots() {
 
                 String username = in.readLine();
                 String pass = in.readLine();
-                out.println(Register(username,pass));
+                
+
+                User existingUser = findUser(username);
+                String response;
+
+                if (existingUser == null) {
+                    response = Register(username, pass); //  First Time
+                } else {
+                    response = loginUser(username, pass); // Loggin
+                }
+
+                out.println(response); 
 
                 while (true) {
                     String option = in.readLine();
