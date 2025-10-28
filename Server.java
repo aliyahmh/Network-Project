@@ -23,8 +23,8 @@ public class Server {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }}
+        }}}
+
 
     // Create rooms manually
    private static void initializeRooms() {
