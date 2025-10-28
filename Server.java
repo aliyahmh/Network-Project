@@ -23,7 +23,7 @@ public class Server {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }}}
+        }}
 
 
     // Create rooms manually
@@ -51,17 +51,17 @@ public class Server {
     }
 
     // Register new user
-    public static synchronized String Register(String username, String pass) {
-        if (username == null || username.trim().equals("")) || password==null || password.trim().equals("") {
+    public static synchronized String Register(String username, String password) {
+        if (username == null || username.trim().equals("") || password==null || password.trim().equals("")) {
             return "❌ Username  or password cannot be empty.";
         }
-        User existingUser = findUser(username);
+        User existingUser = findUser(username,password);
 
         if (existingUser == null) {
              return "❌ No account found with that username. Please register first.";}
     
 
-        User u= new User(username, pass);
+        User u= new User(username, password);
          users.add(u);
         return "✅ Registration successful! Wlcome " + username +".";}
           
@@ -71,7 +71,7 @@ public class Server {
              return "❌ Username or password cannot be empty.";
     }
 
-    User existingUser = findUser(username);
+    User existingUser = findUser(username,password);
 
     if (existingUser == null) {
         return "❌ No account found with that username. Please register first.";
@@ -87,14 +87,14 @@ public class Server {
     
 
 
-    private static User findUser(String username) {
+    private static User findUser(String username, String password) {
         for (User user : users) {
-            if (user.getUserName().equals(username) && u.getPassword().equals(password)) {
-	              {
-                return true;
+            if (user.getUserName().equals(username) && user.getPassword().equals(password)) {
+	              
+                return user;
             }
         }
-        return false;
+        return null;
     }
 
     private static Reservation findReservation(String reservationId) {
@@ -106,8 +106,8 @@ public class Server {
         return null;
     }
 
-     public static String getUserReservations(String username) {
-        User user = findUser(username);
+     public static String getUserReservations(String username, String password) {
+        User user = findUser(username,password);
         if (user == null) {
             return "ERROR: User not found";
         }
@@ -150,37 +150,10 @@ public class Server {
 
     
 
-        /*public static String getAvailableSlots(String roomType, String day) {
-        String result = "";
-        System.out.println("DEBUG: Looking for " + roomType + " on " + day);
-        
-        for (Room room : rooms) {
-            System.out.println("DEBUG: Checking room " + room.getId() + " of type " + room.getType());
-            if (room.getType().equals(roomType)) {
-                // FIX: Properly iterate through the array
-                TimeSlot[] slots = room.getTimeSlots();
-                for (int i = 0; i < room.getTimeSlotCount(); i++) {
-                    TimeSlot slot = slots[i];
-                    System.out.println("DEBUG: Slot - " + slot.getDay() + " " + slot.getTime() + " Available: " + slot.isAvailable());
-                    if (slot.getDay().equals(day) && slot.isAvailable()) {
-                        if (!result.isEmpty()) {
-                            result += "|";
-                        }
-                        result += room.getId() + ":" + day + ":" + slot.getTime();
-                    }
-                }
-            }
-        }
-        System.out.println("DEBUG: Result: " + result);
-        return result.isEmpty() ? "ERROR: No available slots" : result;
-    }*/
         
         
 
-
- 
-
-    public static String makeReservation(String username, String slotId) {
+    public static String makeReservation(String username, String password,String slotId) {
         String[] parts = slotId.split(":");
         if (parts.length < 3) {  // Now we expect 3 parts!
             return "ERROR: Invalid slot format";
@@ -227,7 +200,7 @@ public class Server {
         Reservation reservation = new Reservation(username, roomId, day, time, reservationId);
         reservations.add(reservation);
         
-        User user = findUser(username);
+        User user = findUser(username,password);
         if (user != null) {
             user.addReservation(reservation);
         }
@@ -236,7 +209,7 @@ public class Server {
     }
 
 
-    public static String cancelReservation(String reservationId, String username) {
+    public static String cancelReservation(String reservationId, String username, String password) {
         // Find reservation
         Reservation reservationToCancel = null;
         
@@ -273,7 +246,7 @@ public class Server {
         reservations.remove(reservationToCancel);
         
         // Remove from user's reservations
-        User user = findUser(username);
+        User user = findUser(username,password);
         if (user != null) {
             user.removeReservation(reservationToCancel);
         }
@@ -306,16 +279,16 @@ public static void printAllRoomsAndSlots() {
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
                 String username = in.readLine();
-                String pass = in.readLine();
+                String pass1 = in.readLine();
                 
 
-                User existingUser = findUser(username);
+                User existingUser = findUser(username,pass1);
                 String response;
 
                 if (existingUser == null) {
-                    response = Register(username, pass); //  First Time
+                    response = Register(username, pass1); //  First Time
                 } else {
-                    response = loginUser(username, pass); // Loggin
+                    response = loginUser(username, pass1); // Loggin
                 }
 
                 out.println(response); 
@@ -340,13 +313,15 @@ public static void printAllRoomsAndSlots() {
                     }
                     else if (option.equals("2")) {
                         String user = in.readLine();
+                        String pass2 = in.readLine();
                         String slotid = in.readLine();
-                        out.println(makeReservation(user, slotid));
+                        out.println(makeReservation(user,pass2 ,slotid));
                     }
                     else if (option.equals("3")) {
                         String id = in.readLine();
                         String name = in.readLine();
-                        out.println(cancelReservation(id, name));
+                        String pass3 = in.readLine();
+                        out.println(cancelReservation(id, name, pass3));
                     }
                     else if (option.equals("4")) {
                         out.println("👋 Disconnected.");
