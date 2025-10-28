@@ -15,8 +15,8 @@ public class client {
             String username = sc.nextLine();
             out.println(username);
             System.out.print("Enter your password: ");
-            String pass = sc.nextLine();
-            out.println(pass);
+            String pass1 = sc.nextLine();
+            out.println(pass1);
             System.out.println(in.readLine());
 
 
@@ -46,8 +46,10 @@ public class client {
                     }
                 }
                 else if (choice.equals("2")) {
-                     System.out.print("Enter  name (e.g., Lab1): ");
+                    System.out.print("Enter  username  ");
                     String user = sc.nextLine();
+                    System.out.print("Enter  password  ");
+                    String pass2 = sc.nextLine();
                     System.out.print("Enter room name (e.g., Lab1): ");
                     String room = sc.nextLine();
                     System.out.print("Enter day: ");
@@ -56,6 +58,7 @@ public class client {
                     String time = sc.nextLine();
                     String slotid=room+":"+day+":"+time;
                     out.println(user);
+                    out.println(pass2);
                     out.println(slotid);
                     System.out.println("\n" + in.readLine());
                 }
@@ -64,8 +67,11 @@ public class client {
                     String id = sc.nextLine();
                     System.out.print("Enter username: ");
                     String name = sc.nextLine();
+                    System.out.print("Enter password: ");
+                    String pass3 = sc.nextLine();
                     out.println(id);
                     out.println(name);
+                    out.println(pass3);
                     System.out.println("\n" + in.readLine());
                 }
                 else if (choice.equals("4")) {
